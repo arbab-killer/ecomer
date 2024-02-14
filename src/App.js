@@ -1,25 +1,49 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useState } from "react";
+import Signup from "./pages/Signup";
+import Signin from "./pages/Signin";
+import Home from "./pages/Home";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
+import { getAuth, onAuthStateChanged ,signOut } from "firebase/auth";
+const auth = getAuth();
 
-function App() {
+const App = () => {
+  const [user, setuser] = useState(null);
+  useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setuser(user);
+      } else {
+        setuser(null);
+      }
+    });
+  }, []);
+
+  if (user === null) {
+    return (
+      <>
+        <div>
+          <Toaster position="top-center"></Toaster>
+        </div>
+        <Router>
+          <Routes>
+            <Route path="/" element={<Signup />} />
+            <Route path="/login" element={<Signin />} />
+          </Routes>
+        </Router>
+      </>
+    );
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+    <Toaster position="top-center"></Toaster>
+  <Home/>
+    <div>
+      <button onClick={()=>signOut(auth)}>logout</button>
+    </div>
     </div>
   );
-}
+};
 
 export default App;
